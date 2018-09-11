@@ -1,23 +1,26 @@
+try{
 node{
-   stage('SCM Checkout'){
-     git 'https://github.com/javahometech/my-app'
+   stage('Git Clone'){
+        git 'https://github.com/krishna17m/myapp8'
+    }
+    stage('Maven Build'){
+        sh 'mvn clean package'
+    }
+    stage('Deploy to Tomcat'){
+        sh 'mv target/*.war target/test.war'
+
+           sh ' rm -rf /root/tomcat8/apache-tomcat-8.5.33/webapps/test.*'
+            sh 'cp target/test.war /root/tomcat8/apache-tomcat-8.5.33/webapps/'
+            sh 'service tomcat stop'
+            sh 'service tomcat start'
+        slackSend color: 'good',
+        message: "Job ${env.JOB_NAME} deployed Successfully having build ${env.BUILD_URL}"
    }
-   stage('Compile-Package'){
-      // Get maven home path
-      def mvnHome =  tool name: 'maven-3', type: 'maven'   
-      sh "${mvnHome}/bin/mvn package"
-   }
-   stage('Email Notification'){
-      mail bcc: '', body: '''Hi Welcome to jenkins email alerts
-      Thanks
-      Hari''', cc: '', from: '', replyTo: '', subject: 'Jenkins Job', to: 'hari.kammana@gmail.com'
-   }
-   stage('Slack Notification'){
-       slackSend baseUrl: 'https://hooks.slack.com/services/',
-       channel: '#jenkins-pipeline-demo',
-       color: 'good', 
-       message: 'Welcome to Jenkins, Slack!', 
-       teamDomain: 'javahomecloud',
-       tokenCredentialId: 'slack-demo'
-   }
+
+}
+}
+catch(error){
+   slackSend color: 'danger',
+        message: "Job ${env.JOB_NAME} deployment failed having build ${env.BUILD_URL}"
+        error''
 }
