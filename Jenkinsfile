@@ -9,8 +9,8 @@ node{
     stage('Deploy to Tomcat'){
         sh 'mv target/*.war target/test.war'
 
-           sh 'rm -rf /root/tomcat8/apache-tomcat-8.5.33/webapps/test*.war'
-            sh 'cp target/test.war /root/tomcat8/apache-tomcat-8.5.33/webapps/'
+           sh 'sudo rm -rf /root/tomcat8/apache-tomcat-8.5.33/webapps/test*.war'
+            sh 'sudo cp target/test.war /root/tomcat8/apache-tomcat-8.5.33/webapps/'
             sh 'service tomcat stop'
             sh 'service tomcat start'
         slackSend color: 'good',
